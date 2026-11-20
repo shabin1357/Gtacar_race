@@ -20,14 +20,14 @@ export interface SavedProfile {
   autoDayNight: boolean;
 }
 
-const STORAGE_KEY = 'project_velocity_save_v3';
+const STORAGE_KEY = 'project_velocity_save_v4';
 
 export const DEFAULT_SAVE: SavedProfile = {
   bankCash: 25000,
   bestTimeTrialSeconds: null,
   totalTakedowns: 0,
   customization: {
-    vehicleId: 'Supercar',
+    vehicleId: 'PegassiIgnus',
     paintId: 'alpine_blue',
     rimId: 'silver',
     underglowId: 'off',
@@ -38,7 +38,7 @@ export const DEFAULT_SAVE: SavedProfile = {
   weather: 'light_rain',
   weatherIntensity: 0.75,
   autoWeather: false,
-  timeOfDayHours: 20.4, // Vibrant wet neon dusk/night matching reference screenshots
+  timeOfDayHours: 20.4,
   autoDayNight: false,
 };
 
@@ -52,10 +52,10 @@ export function loadSavedProfile(): SavedProfile {
       ...(parsed.customization ?? {}),
     };
     if (!VEHICLE_SPECS.some((v) => v.id === mergedCust.vehicleId)) {
-      mergedCust.vehicleId = 'Supercar';
+      mergedCust.vehicleId = DEFAULT_SAVE.customization.vehicleId;
     }
     if (!CAR_PAINTS.some((p) => p.id === mergedCust.paintId)) {
-      mergedCust.paintId = 'alpine_blue';
+      mergedCust.paintId = DEFAULT_SAVE.customization.paintId;
     }
     const validWeather = WEATHER_OPTIONS.some((w) => w.id === parsed.weather)
       ? (parsed.weather as WeatherCondition)

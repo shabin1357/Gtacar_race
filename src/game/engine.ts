@@ -202,7 +202,7 @@ export class ViceRunEngine {
   private graphicsQuality: GraphicsQuality = 'high';
   private cameraMode: CameraMode = 'chase';
   private customization: CustomizationState;
-  private vehicleSpec: VehicleSpec = VEHICLE_SPECS[1];
+  private vehicleSpec: VehicleSpec = VEHICLE_SPECS[0];
   private paused = false;
 
   // Game Mode & GPS State
@@ -248,6 +248,7 @@ export class ViceRunEngine {
   private alertSeq = 1;
   private activeAlert: PursuitAlert | null = null;
   private alertTimer = 0;
+  private lastDistrictId = '';
   private camShake = 0;
   private titleOrbitAngle = 0.26;
 
@@ -853,6 +854,21 @@ export class ViceRunEngine {
     this.pushAlert('Vehicle Reset', 'Cleared onto main avenue', 'cyan');
   }
 
+  public teleportToLocation(x: number, z: number, label: string, rotY = Math.PI): void {
+    this.px = THREE.MathUtils.clamp(x, PLAYABLE_MIN_X + 10, PLAYABLE_MAX_X - 10);
+    this.py = 0.2;
+    this.pz = THREE.MathUtils.clamp(z, PLAYABLE_MIN_Z + 10, PLAYABLE_MAX_Z - 10);
+    this.pvx = 0;
+    this.pvy = 0;
+    this.pvz = 0;
+    this.pRotY = rotY;
+    this.bustTimer = 0;
+    this.playerRig.root.position.set(this.px, this.py, this.pz);
+    this.playerRig.root.rotation.set(0, this.pRotY, 0);
+    this.pushAlert('Fast Travel', label, 'emerald');
+    this.emitHud();
+  }
+
   public setTimeOfDayHours(hours: number): void {
     this.timeOfDayHours = ((hours % 24) + 24) % 24;
     this.syncAtmosphereToScene();
@@ -939,9 +955,17 @@ export class ViceRunEngine {
   }
 
   public updateCustomization(partial: Partial<CustomizationState>): CustomizationState {
+    const switchingVehicle =
+      partial.vehicleId !== undefined && partial.vehicleId !== this.customization.vehicleId;
     this.customization = { ...this.customization, ...partial };
     this.vehicleSpec =
-      VEHICLE_SPECS.find((v) => v.id === this.customization.vehicleId) ?? VEHICLE_SPECS[1];
+      VEHICLE_SPECS.find((v) => v.id === this.customization.vehicleId) ?? VEHICLE_SPECS[0];
+
+    // When picking a new car in the Showroom, load its authentic factory paint color
+    if (switchingVehicle && partial.paintId === undefined) {
+      this.customization.paintId = this.vehicleSpec.defaultPaintId;
+    }
+
     this.applyCustomizationVisuals();
     this.savedProfile.customization = { ...this.customization };
     writeSavedProfile(this.savedProfile);
@@ -955,8 +979,8 @@ export class ViceRunEngine {
     const underglow =
       UNDERGLOW_OPTIONS.find((u) => u.id === this.customization.underglowId) ?? UNDERGLOW_OPTIONS[0];
 
-    this.playerRig.applyVehicleSpec(this.vehicleSpec);
     this.playerRig.applyPaint(paint);
+    this.playerRig.applyVehicleSpec(this.vehicleSpec);
     this.playerRig.applyRimColor(rim.hex);
     this.playerRig.setUnderglow(underglow.enabled, underglow.hex);
   }
@@ -1394,6 +1418,22 @@ export class ViceRunEngine {
   }
 
   private updateMissionsAndRacers(dt: number): void {
+    const currentDistrict = this.world.getDistrictMeta(this.px, this.pz);
+    if (this.phase === 'playing' && currentDistrict.id !== this.lastDistrictId) {
+      this.lastDistrictId = currentDistrict.id;
+      if (currentDistrict.restricted && currentDistrict.baseWanted && this.gameMode !== 'timetrial') {
+        if (this.wantedLevel < currentDistrict.baseWanted) {
+          this.wantedLevel = currentDistrict.baseWanted;
+          this.audio.playChime('takedown');
+          this.pushAlert(
+            `Restricted Zone · ${currentDistrict.baseWanted}★`,
+            `Trespassing in ${currentDistrict.name}`,
+            'red'
+          );
+        }
+      }
+    }
+
     if (this.customGps) {
       const gd = Math.hypot(this.px - this.customGps.x, this.pz - this.customGps.z);
       this.gpsBeaconGroup.rotation.y = this.elapsed * 1.6;

@@ -11,22 +11,149 @@ export const PLAYABLE_MIN_Z = -245;
 export const PLAYABLE_MAX_Z = 245;
 
 export interface DistrictMarker {
+  id: string;
+  name: string;
+  gridSector: string;
+  biome: string;
+  summary: string;
+  x: number;
+  z: number;
+  radius: number;
+  wantedMultiplier: number;
+  restricted?: boolean;
+  baseWanted?: number;
+}
+
+export interface PlayerSpawnPoint {
+  id: string;
   name: string;
   x: number;
   z: number;
+  rotY: number;
 }
 
 export const WORLD_DISTRICTS: DistrictMarker[] = [
-  { name: 'Downtown', x: -50, z: -50 },
-  { name: 'Shopping District', x: 150, z: 50 },
-  { name: 'Beaches', x: 255, z: -90 },
-  { name: 'Residential', x: -150, z: 150 },
-  { name: 'Industrial', x: -150, z: -150 },
-  { name: 'Airport', x: 110, z: 210 },
-  { name: 'Bay Bridge', x: 310, z: 0 },
-  { name: 'Express Highway', x: -200, z: 0 },
-  { name: 'Countryside', x: 150, z: -175 },
-  { name: 'Coastal Mountains', x: -245, z: -60 },
+  {
+    id: 'redrock_badlands',
+    name: 'Redrock Badlands & Mirage Sea',
+    gridSector: 'D1–F3',
+    biome: 'Arid Desert & Salt Lake',
+    summary: 'Mirage Sea shoreline, ochre mesas, off-road trails & desert airstrip',
+    x: 40,
+    z: -195,
+    radius: 72,
+    wantedMultiplier: 0.8,
+  },
+  {
+    id: 'fort_vespera',
+    name: 'Fort Vespera Airbase',
+    gridSector: 'B3–C3',
+    biome: 'Restricted Military Base',
+    summary: 'Heavy radar perimeter & fighter hangars — instant 4★ alert',
+    x: -165,
+    z: -155,
+    radius: 56,
+    wantedMultiplier: 1.6,
+    restricted: true,
+    baseWanted: 4,
+  },
+  {
+    id: 'verona_hills',
+    name: 'Verona Hills & Estates',
+    gridSector: 'B4–C5',
+    biome: 'Luxury Hillside Canyon',
+    summary: 'Winding hillside drives, palm villas & exotic car spawns',
+    x: -155,
+    z: -20,
+    radius: 64,
+    wantedMultiplier: 1.2,
+  },
+  {
+    id: 'coral_cove',
+    name: 'Coral Cove Boardwalk',
+    gridSector: 'B6–C7',
+    biome: 'Coastal Canals & Pier',
+    summary: 'Waterfront promenade, marina slips & stunt jump ramps',
+    x: -150,
+    z: 135,
+    radius: 62,
+    wantedMultiplier: 1.0,
+  },
+  {
+    id: 'solara_metro',
+    name: 'Solara Metropolis Core',
+    gridSector: 'D5–E7',
+    biome: 'High-Density Financial Core',
+    summary: 'Neon skyscraper canyon, elevated loops & high pursuit heat',
+    x: 10,
+    z: 10,
+    radius: 78,
+    wantedMultiplier: 1.5,
+  },
+  {
+    id: 'port_meridian',
+    name: 'Port Meridian Docks',
+    gridSector: 'D8–E8',
+    biome: 'Heavy Industrial Harbor',
+    summary: 'Container terminals, cargo cranes & dry-dock getaway alleys',
+    x: -55,
+    z: 195,
+    radius: 58,
+    wantedMultiplier: 1.1,
+  },
+  {
+    id: 'solara_airport',
+    name: 'Solara Intl Airport',
+    gridSector: 'E8–F8',
+    biome: 'Restricted Aviation Hub',
+    summary: 'Dual commercial runways & jet hangars — 3★ tarmac security alert',
+    x: 115,
+    z: 205,
+    radius: 60,
+    wantedMultiplier: 1.4,
+    restricted: true,
+    baseWanted: 3,
+  },
+  {
+    id: 'neon_cay',
+    name: 'Neon Cay & Lighthouse Pt',
+    gridSector: 'G6–G7',
+    biome: 'Tropical Barrier Resort',
+    summary: 'Ocean Drive neon strip, golden sands & coastal lighthouse',
+    x: 245,
+    z: 75,
+    radius: 68,
+    wantedMultiplier: 1.2,
+  },
+  {
+    id: 'bay_causeway',
+    name: 'Emerald Bay Causeway',
+    gridSector: 'G5–H5',
+    biome: 'Over-Water Suspension Bridge',
+    summary: 'High-speed ocean suspension span linking Solara & outer keys',
+    x: 310,
+    z: 0,
+    radius: 48,
+    wantedMultiplier: 1.3,
+  },
+  {
+    id: 'solar_ridge',
+    name: 'Mt. Calavera Ridge',
+    gridSector: 'C1–E1',
+    biome: 'Northern Alpine Peaks',
+    summary: 'Scenic summit overlook & northern perimeter expressway',
+    x: -215,
+    z: -60,
+    radius: 60,
+    wantedMultiplier: 0.9,
+  },
+];
+
+export const PLAYER_SPAWNS: PlayerSpawnPoint[] = [
+  { id: 'neon_cay_strip', name: 'Neon Cay Boulevard', x: 200, z: 110, rotY: Math.PI },
+  { id: 'coral_safehouse', name: 'Coral Cove Safehouse', x: -100, z: 100, rotY: Math.PI },
+  { id: 'redrock_airstrip', name: 'Redrock Desert Loop', x: 0, z: -200, rotY: Math.PI / 2 },
+  { id: 'metro_plaza', name: 'Solara Metropolis Plaza', x: 0, z: 0, rotY: Math.PI },
 ];
 
 export interface WorldBuildResult {
@@ -45,6 +172,7 @@ export interface WorldBuildResult {
   setRoadWetness: (wetness01: number, nightFactor: number) => void;
   updateAmbientProps: (elapsed: number, nightFactor: number) => void;
   getDistrictName: (x: number, z: number) => string;
+  getDistrictMeta: (x: number, z: number) => DistrictMarker;
 }
 
 function createRng(seed: number): () => number {
@@ -992,6 +1120,136 @@ export function buildLeonidaWorld(textures: ProceduralTextureSet): WorldBuildRes
     pickupMeshes.set(id, pGroup);
   });
 
+  // 17. Original Solara State & Redrock County 3D Landmarks
+  // A. Mirage Sea Inland Saltwater Lake & Redrock Desert Mesas (North)
+  const desertFloor = new THREE.Mesh(
+    new THREE.PlaneGeometry(360, 145),
+    new THREE.MeshStandardMaterial({ color: 0x9c7648, roughness: 0.94, metalness: 0.02 })
+  );
+  desertFloor.rotation.x = -Math.PI / 2;
+  desertFloor.position.set(20, 0.02, -255);
+  group.add(desertFloor);
+
+  const mirageSea = new THREE.Mesh(
+    new THREE.CircleGeometry(52, 28),
+    new THREE.MeshPhysicalMaterial({
+      color: 0x0ea5a8,
+      roughness: 0.14,
+      metalness: 0.25,
+      clearcoat: 1.0,
+    })
+  );
+  mirageSea.rotation.x = -Math.PI / 2;
+  mirageSea.scale.set(1.8, 0.85, 1);
+  mirageSea.position.set(45, 0.06, -242);
+  group.add(mirageSea);
+
+  const mesaMat = new THREE.MeshStandardMaterial({ color: 0x8f5534, roughness: 0.92 });
+  for (const [mx, mz, mr, mh] of [
+    [-85, -275, 28, 36],
+    [145, -278, 32, 42],
+    [35, -315, 44, 54],
+  ]) {
+    const mesa = new THREE.Mesh(new THREE.CylinderGeometry(mr * 0.62, mr, mh, 7), mesaMat);
+    mesa.position.set(mx, mh * 0.5, mz);
+    group.add(mesa);
+  }
+
+  // B. Fort Vespera Restricted Military Airbase (Northwest: radar dome, hangars & red beacons)
+  const milConcreteMat = new THREE.MeshStandardMaterial({ color: 0x4b5563, roughness: 0.86 });
+  const fortTarmac = new THREE.Mesh(new THREE.PlaneGeometry(78, 64), milConcreteMat);
+  fortTarmac.rotation.x = -Math.PI / 2;
+  fortTarmac.position.set(-155, 0.04, -155);
+  group.add(fortTarmac);
+
+  const radarBase = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 4.2, 16, 10), milConcreteMat);
+  radarBase.position.set(-178, 8, -172);
+  group.add(radarBase);
+  const radarDome = new THREE.Mesh(
+    new THREE.SphereGeometry(4.8, 16, 12),
+    new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.4 })
+  );
+  radarDome.position.set(-178, 18.5, -172);
+  group.add(radarDome);
+
+  const redBeaconMat = new THREE.MeshStandardMaterial({
+    color: 0xff2244,
+    emissive: 0xff1133,
+    emissiveIntensity: 4.0,
+  });
+  for (const [bx, bz] of [
+    [-190, -125],
+    [-120, -125],
+    [-190, -185],
+    [-120, -185],
+  ]) {
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.3, 6.5, 8), milConcreteMat);
+    post.position.set(bx, 3.25, bz);
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 8), redBeaconMat);
+    bulb.position.set(bx, 6.8, bz);
+    group.add(post, bulb);
+  }
+
+  // C. Port Meridian Industrial Container Cranes (Southwest Harbor)
+  const craneRedMat = new THREE.MeshStandardMaterial({ color: 0xd93829, roughness: 0.45, metalness: 0.5 });
+  const containerBlueMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.55 });
+  const containerAmberMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.55 });
+  for (const cx of [-78, -32]) {
+    const legL = new THREE.Mesh(new THREE.BoxGeometry(1.4, 24, 1.4), craneRedMat);
+    legL.position.set(cx - 5, 12, 224);
+    const legR = legL.clone();
+    legR.position.x = cx + 5;
+    const boom = new THREE.Mesh(new THREE.BoxGeometry(14, 1.8, 22), craneRedMat);
+    boom.position.set(cx, 23.5, 228);
+    group.add(legL, legR, boom);
+
+    const box1 = new THREE.Mesh(new THREE.BoxGeometry(3.2, 3.0, 9.2), containerBlueMat);
+    box1.position.set(cx, 1.5, 212);
+    const box2 = new THREE.Mesh(new THREE.BoxGeometry(3.2, 3.0, 9.2), containerAmberMat);
+    box2.position.set(cx + 3.6, 1.5, 212);
+    group.add(box1, box2);
+  }
+
+  // D. Neon Cay Coastal Lighthouse with Rotating Warm Beam (Southeast Point)
+  const lhGroup = new THREE.Group();
+  lhGroup.position.set(275, 0, 178);
+  const lhTowerWhite = new THREE.Mesh(
+    new THREE.CylinderGeometry(2.2, 3.8, 28, 16),
+    new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 })
+  );
+  lhTowerWhite.position.y = 14;
+  const lhStripe = new THREE.Mesh(
+    new THREE.CylinderGeometry(2.75, 3.25, 7, 16),
+    new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.5 })
+  );
+  lhStripe.position.y = 16;
+  const lhLantern = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.9, 1.9, 3.4, 14),
+    new THREE.MeshStandardMaterial({
+      color: 0xfef08a,
+      emissive: 0xfde047,
+      emissiveIntensity: 4.5,
+    })
+  );
+  lhLantern.position.y = 29.5;
+  const lhBeamPivot = new THREE.Group();
+  lhBeamPivot.position.y = 29.5;
+  const lhBeamGeo = new THREE.ConeGeometry(8.5, 75, 14, 1, true);
+  lhBeamGeo.translate(0, -37.5, 0);
+  lhBeamGeo.rotateX(Math.PI / 2);
+  const lhBeamMat = new THREE.MeshBasicMaterial({
+    color: 0xfef08a,
+    transparent: true,
+    opacity: 0.16,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+  });
+  const lhBeam = new THREE.Mesh(lhBeamGeo, lhBeamMat);
+  lhBeamPivot.add(lhBeam);
+  lhGroup.add(lhTowerWhite, lhStripe, lhLantern, lhBeamPivot);
+  group.add(lhGroup);
+
   const setEmissiveScale = (scale: number) => {
     for (const m of emissiveMaterials) m.emissiveIntensity = scale;
     for (const n of neonTrimMaterials) n.emissiveIntensity = Math.max(0.55, scale * 2.1);
@@ -1007,7 +1265,6 @@ export function buildLeonidaWorld(textures: ProceduralTextureSet): WorldBuildRes
       rm.clearcoat = THREE.MathUtils.lerp(0.22, 1.0, w);
       rm.clearcoatRoughness = THREE.MathUtils.lerp(0.25, 0.04, w);
     }
-    // Neon puddles blaze brightly on wet dusk/night streets (Screenshots #3, #4, #6, #12)
     const neonReflectionOpacity = w * (0.04 + nightFactor * 0.24);
     for (const pm of wetNeonPoolMats) {
       pm.opacity = neonReflectionOpacity;
@@ -1015,23 +1272,30 @@ export function buildLeonidaWorld(textures: ProceduralTextureSet): WorldBuildRes
   };
 
   const updateAmbientProps = (elapsed: number, nightFactor: number) => {
-    // High-altitude coastal airliner cruising gently across the sky
     const loopT = (elapsed * 0.014) % 1;
     jetGroup.position.set(220 - loopT * 520, 145, -240 + loopT * 420);
     jetGroup.visible = nightFactor < 0.72;
+
+    // Rotating Neon Cay Lighthouse beam
+    lhBeamPivot.rotation.y = elapsed * 0.65;
+    lhBeamMat.opacity = 0.05 + nightFactor * 0.22;
+    redBeaconMat.emissiveIntensity = 2.0 + Math.abs(Math.sin(elapsed * 4.5)) * 4.5;
   };
 
-  const getDistrictName = (x: number, z: number): string => {
-    if (x > 235 && Math.abs(z) < 22) return 'Bay Bridge';
-    if (x > 218) return 'Beaches';
-    if (x > 10 && z > 108) return 'Airport';
-    if (x < -195) return 'Express Highway';
-    if (x < -105 && z < -20) return 'Industrial';
-    if (x < -105 && z >= -20) return 'Residential';
-    if (x > 105 && z < -100) return 'Countryside';
-    if (x > 105) return 'Shopping District';
-    return 'Downtown';
+  const getDistrictMeta = (x: number, z: number): DistrictMarker => {
+    if (x > 240 && Math.abs(z) < 28) return WORLD_DISTRICTS[8]; // Emerald Bay Causeway
+    if (x > 195) return WORLD_DISTRICTS[7]; // Neon Cay & Lighthouse Pt
+    if (x > 40 && z > 130) return WORLD_DISTRICTS[6]; // Solara Intl Airport (Restricted 3★)
+    if (x <= 40 && x > -115 && z > 135) return WORLD_DISTRICTS[5]; // Port Meridian Docks
+    if (x < -115 && z < -105) return WORLD_DISTRICTS[1]; // Fort Vespera Airbase (Restricted 4★)
+    if (z < -130) return WORLD_DISTRICTS[0]; // Redrock Badlands & Mirage Sea
+    if (x < -195) return WORLD_DISTRICTS[9]; // Mt. Calavera Ridge
+    if (x < -95 && z >= 60) return WORLD_DISTRICTS[3]; // Coral Cove Boardwalk
+    if (x < -95) return WORLD_DISTRICTS[2]; // Verona Hills & Estates
+    return WORLD_DISTRICTS[4]; // Solara Metropolis Core
   };
+
+  const getDistrictName = (x: number, z: number): string => getDistrictMeta(x, z).name;
 
   return {
     group,
@@ -1049,5 +1313,6 @@ export function buildLeonidaWorld(textures: ProceduralTextureSet): WorldBuildRes
     setRoadWetness,
     updateAmbientProps,
     getDistrictName,
+    getDistrictMeta,
   };
 }

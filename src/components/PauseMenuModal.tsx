@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import {
   Car,
   CloudRain,
@@ -6,6 +7,7 @@ import {
   FolderCode,
   Play,
   RotateCcw,
+  Search,
   Smartphone,
   Sun,
   X,
@@ -18,9 +20,12 @@ import {
   GraphicsQuality,
   HudSnapshot,
   RIM_FINISHES,
+  SHOWROOM_SHEETS,
+  ShowroomCategory,
   TIME_PRESETS,
   UNDERGLOW_OPTIONS,
   VEHICLE_SPECS,
+  VehicleSpec,
   WEATHER_OPTIONS,
   WeatherCondition,
 } from '../game/types';
@@ -52,6 +57,39 @@ interface PauseMenuModalProps {
   onToggleTouchControls: (show: boolean) => void;
 }
 
+const SHOWROOM_FILTERS: { id: 'all' | ShowroomCategory; label: string }[] = [
+  { id: 'all', label: `All (${VEHICLE_SPECS.length})` },
+  { id: 'hyper_super', label: 'Hyper & Super' },
+  { id: 'sports_tuner', label: 'Sports & Tuner' },
+  { id: 'muscle_classic', label: 'Muscle & Classic' },
+  { id: 'suv_utility', label: 'SUV, 4x4 & Vans' },
+  { id: 'service_special', label: 'Service & Special' },
+];
+
+// Exact sprite-sheet crop helper for the user's two uploaded car sheets
+function getVehicleThumbStyle(v: VehicleSpec): React.CSSProperties {
+  const { sheet, col, row } = v.thumbnail;
+  if (sheet === 'grid20') {
+    const posX = (col / 3) * 100;
+    const posY = (row / 4) * 100;
+    return {
+      backgroundImage: `url(${SHOWROOM_SHEETS.grid20})`,
+      backgroundSize: '400% 500%',
+      backgroundPosition: `${posX}% ${posY}%`,
+      backgroundRepeat: 'no-repeat',
+    };
+  }
+  // Sheet B: 3 cols x 6 rows dealership screenshot — crop directly onto the studio car photo
+  const colPositions = [7.6, 50.0, 92.4];
+  const rowPositions = [11.3, 27.3, 43.2, 59.1, 75.0, 91.0];
+  return {
+    backgroundImage: `url(${SHOWROOM_SHEETS.dealer18})`,
+    backgroundSize: '342% auto',
+    backgroundPosition: `${colPositions[col] ?? 50}% ${rowPositions[row] ?? 50}%`,
+    backgroundRepeat: 'no-repeat',
+  };
+}
+
 export function PauseMenuModal({
   activeTab,
   onTabChange,
@@ -76,19 +114,33 @@ export function PauseMenuModal({
   onGraphicsQualityChange,
   onToggleTouchControls,
 }: PauseMenuModalProps) {
+  const [showroomFilter, setShowroomFilter] = useState<'all' | ShowroomCategory>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
   const selectedVehicle =
-    VEHICLE_SPECS.find((v) => v.id === customization.vehicleId) ?? VEHICLE_SPECS[1];
+    VEHICLE_SPECS.find((v) => v.id === customization.vehicleId) ?? VEHICLE_SPECS[0];
+
+  const filteredVehicles = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return VEHICLE_SPECS.filter((v) => {
+      if (showroomFilter !== 'all' && v.showroomGroup !== showroomFilter) return false;
+      if (q && !v.name.toLowerCase().includes(q) && !v.category.toLowerCase().includes(q)) {
+        return false;
+      }
+      return true;
+    });
+  }, [showroomFilter, searchQuery]);
 
   const tabs: { id: PauseTab; label: string; icon: typeof Flag }[] = [
     { id: 'modes', label: 'Drive Modes', icon: Flag },
-    { id: 'garage', label: 'Garage (10)', icon: Car },
+    { id: 'garage', label: `Showroom (${VEHICLE_SPECS.length})`, icon: Car },
     { id: 'weather', label: 'Weather & Graphics', icon: CloudRain },
     { id: 'unity', label: 'Unity 6 Android', icon: FolderCode },
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 sm:p-6">
-      <div className="w-full max-w-5xl bg-[#090d16] border border-white/15 rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/82 p-3 sm:p-5">
+      <div className="w-full max-w-6xl bg-[#090d16] border border-white/15 rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[94vh]">
         {/* Top Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 border-b border-white/10">
           <div className="flex items-center gap-3">
@@ -122,7 +174,7 @@ export function PauseMenuModal({
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-1 px-5 pt-3 border-b border-white/10 overflow-x-auto">
+        <div className="flex items-center gap-1 px-5 pt-2.5 border-b border-white/10 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const active = activeTab === tab.id;
@@ -145,7 +197,7 @@ export function PauseMenuModal({
         </div>
 
         {/* Tab Body */}
-        <div className="p-5 overflow-y-auto flex-1">
+        <div className="p-4 sm:p-5 overflow-y-auto flex-1 min-h-0">
           {activeTab === 'modes' && (
             <div className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -153,12 +205,12 @@ export function PauseMenuModal({
                   {
                     id: 'freeroam' as GameMode,
                     title: 'Open-World Free Roam',
-                    desc: 'Explore all 10 coastal districts, Ocean Drive, Airport, and Bay Bridge with dynamic VCPD patrols.',
+                    desc: 'Explore all 10 Solara State & Redrock County regions including restricted Fort Vespera Airbase (4★) and Solara Airport (3★).',
                   },
                   {
                     id: 'mission' as GameMode,
                     title: 'Getaway Contract',
-                    desc: 'Timed 3-stage pursuit escape from Industrial Docks to Airport Hangar and Bay Bridge ($4,500 payout).',
+                    desc: 'Timed 3-stage pursuit escape from Industrial Docks to Solara Airport and Emerald Bay Causeway ($4,500 payout).',
                   },
                   {
                     id: 'timetrial' as GameMode,
@@ -171,7 +223,7 @@ export function PauseMenuModal({
                   {
                     id: 'race' as GameMode,
                     title: 'Street Race vs 3 AI Rivals',
-                    desc: 'Head-to-head street race against 3 rival cars through Downtown, Industrial Highway, and Ocean Drive.',
+                    desc: 'Head-to-head street race against 3 rival cars through Solara Metropolis, Highway, and Neon Cay.',
                   },
                 ].map((item) => {
                   const isCurrent = hud.mission.mode === item.id;
@@ -207,7 +259,7 @@ export function PauseMenuModal({
 
               <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-white/10">
                 <div className="text-xs text-slate-400">
-                  Controls: WASD / Arrows drive · Space handbrake · Shift nitro · C camera · M map · R reset car
+                  Controls: WASD / Arrows drive · Space handbrake · Shift nitro · C camera · M Solara Atlas · R reset car
                 </div>
                 <button
                   type="button"
@@ -225,88 +277,152 @@ export function PauseMenuModal({
           )}
 
           {activeTab === 'garage' && (
-            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6">
-              {/* All 10 Vehicle Classes */}
-              <div>
-                <div className="text-[11px] font-hud uppercase tracking-widest text-slate-400 mb-2.5">
-                  All Cars Pack — Select Vehicle Class
+            <div className="grid grid-cols-1 lg:grid-cols-[1.55fr_1fr] gap-5">
+              {/* Left: 38-Car Dealership Showroom Catalog */}
+              <div className="flex flex-col gap-3 min-h-0">
+                {/* Category Filter Tabs + Search */}
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-1">
+                    {SHOWROOM_FILTERS.map((f) => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => setShowroomFilter(f.id)}
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-hud uppercase tracking-wider border cursor-pointer transition-colors ${
+                          showroomFilter === f.id
+                            ? 'bg-rose-600 border-rose-400 text-white font-bold'
+                            : 'bg-white/[0.04] border-white/10 text-slate-300 hover:text-white'
+                        }`}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search 38 cars..."
+                      className="pl-8 pr-3 py-1 rounded-md bg-white/[0.05] border border-white/15 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-400 w-40"
+                    />
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {VEHICLE_SPECS.map((v) => {
+
+                {/* Dealership Thumbnail Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[58vh] overflow-y-auto pr-1">
+                  {filteredVehicles.map((v) => {
                     const selected = v.id === customization.vehicleId;
                     return (
                       <button
                         key={v.id}
                         type="button"
                         onClick={() => onUpdateCustomization({ vehicleId: v.id })}
-                        className={`p-3 rounded-lg text-left border transition-colors cursor-pointer ${
+                        className={`group rounded-lg overflow-hidden text-left border transition-all cursor-pointer flex flex-col bg-[#0f1422] ${
                           selected
-                            ? 'bg-sky-500/15 border-sky-400 text-white'
-                            : 'bg-white/[0.03] border-white/10 text-slate-300 hover:bg-white/[0.06]'
+                            ? 'border-sky-400 ring-1 ring-sky-400 shadow-[0_0_18px_rgba(56,189,248,0.28)]'
+                            : 'border-white/10 hover:border-white/30'
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-1">
-                          <span className="text-xs font-semibold">{v.name}</span>
-                          <span className="font-hud text-[11px] text-sky-400">
+                        {/* Cropped Car Photo from User's Uploaded Showroom Sheets */}
+                        <div className="relative w-full aspect-[16/10] bg-slate-900 overflow-hidden">
+                          <div
+                            className="w-full h-full transition-transform duration-200 group-hover:scale-105"
+                            style={getVehicleThumbStyle(v)}
+                          />
+                          <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 text-[10px] font-hud font-bold text-sky-400">
                             {v.maxSpeedKph} km/h
+                          </div>
+                          {selected && (
+                            <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-sky-500 text-slate-950 text-[9px] font-hud font-bold uppercase">
+                              Equipped
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Dealership Name & Price Strip */}
+                        <div className="flex items-center justify-between gap-1 px-2 py-1.5 bg-[#0b0f1a] border-t border-white/10">
+                          <div className="min-w-0">
+                            <div className="text-[11px] font-bold text-white truncate">
+                              {v.name}
+                            </div>
+                            <div className="text-[9.5px] text-slate-400 truncate">
+                              {v.category}
+                            </div>
+                          </div>
+                          <span className="px-1.5 py-0.5 rounded bg-rose-700/90 text-white text-[10px] font-hud font-bold shrink-0">
+                            {v.price > 0 ? `$${v.price.toLocaleString()}` : 'FLEET'}
                           </span>
                         </div>
-                        <div className="mt-0.5 text-[11px] text-slate-400">{v.category}</div>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Selected Vehicle Specs & Visual Customization */}
-              <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-2.5">
-                  <div className="flex items-baseline justify-between">
-                    <h3 className="font-display text-base font-semibold text-white">
-                      {selectedVehicle.name}
-                    </h3>
-                    <span className="text-xs font-hud text-slate-400">
-                      {selectedVehicle.mass} kg
-                    </span>
+              {/* Right: Live Selected Vehicle Specs & Customization */}
+              <div className="space-y-3.5">
+                <div className="rounded-xl overflow-hidden bg-white/[0.03] border border-white/10">
+                  <div className="w-full aspect-[16/9] bg-slate-900">
+                    <div className="w-full h-full" style={getVehicleThumbStyle(selectedVehicle)} />
                   </div>
-
-                  {[
-                    { label: 'Top Speed', value: `${selectedVehicle.maxSpeedKph} km/h`, pct: (selectedVehicle.maxSpeedKph / 380) * 100 },
-                    { label: 'Acceleration', value: `${selectedVehicle.acceleration}`, pct: (selectedVehicle.acceleration / 3100) * 100 },
-                    { label: 'Braking', value: `${selectedVehicle.brakeForce}`, pct: (selectedVehicle.brakeForce / 4300) * 100 },
-                    { label: 'Tire Grip', value: `${selectedVehicle.grip.toFixed(2)}`, pct: (selectedVehicle.grip / 1.4) * 100 },
-                    { label: 'Off-Road', value: `${Math.round(selectedVehicle.offRoadCapability * 100)}%`, pct: selectedVehicle.offRoadCapability * 100 },
-                  ].map((stat) => (
-                    <div key={stat.label} className="space-y-1">
-                      <div className="flex justify-between text-[11px] font-hud">
-                        <span className="text-slate-400 uppercase">{stat.label}</span>
-                        <span className="text-slate-200">{stat.value}</span>
+                  <div className="p-3.5 space-y-2">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <div>
+                        <h3 className="font-display text-base font-bold text-white">
+                          {selectedVehicle.name}
+                        </h3>
+                        <div className="text-[11px] text-slate-400">
+                          {selectedVehicle.category} · {selectedVehicle.mass} kg
+                        </div>
                       </div>
-                      <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
-                        <div
-                          className="h-full bg-sky-400 rounded-full"
-                          style={{ width: `${Math.min(100, Math.max(4, stat.pct))}%` }}
-                        />
-                      </div>
+                      <span className="px-2 py-0.5 rounded bg-rose-700 text-white font-hud text-xs font-bold">
+                        {selectedVehicle.price > 0
+                          ? `$${selectedVehicle.price.toLocaleString()}`
+                          : 'FLEET UNIT'}
+                      </span>
                     </div>
-                  ))}
+
+                    {[
+                      { label: 'Top Speed', value: `${selectedVehicle.maxSpeedKph} km/h`, pct: (selectedVehicle.maxSpeedKph / 386) * 100 },
+                      { label: 'Acceleration', value: `${selectedVehicle.acceleration}`, pct: (selectedVehicle.acceleration / 3200) * 100 },
+                      { label: 'Braking', value: `${selectedVehicle.brakeForce}`, pct: (selectedVehicle.brakeForce / 4400) * 100 },
+                      { label: 'Tire Grip', value: `${selectedVehicle.grip.toFixed(2)}`, pct: (selectedVehicle.grip / 1.44) * 100 },
+                      { label: 'Off-Road', value: `${Math.round(selectedVehicle.offRoadCapability * 100)}%`, pct: selectedVehicle.offRoadCapability * 100 },
+                    ].map((stat) => (
+                      <div key={stat.label} className="space-y-1">
+                        <div className="flex justify-between text-[10.5px] font-hud">
+                          <span className="text-slate-400 uppercase">{stat.label}</span>
+                          <span className="text-slate-200">{stat.value}</span>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                          <div
+                            className="h-full bg-sky-400 rounded-full"
+                            style={{ width: `${Math.min(100, Math.max(4, stat.pct))}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Paint Swatches */}
+                {/* 16 Metallic & Matte Factory Paint Swatches */}
                 <div>
-                  <div className="text-[11px] font-hud uppercase tracking-widest text-slate-400 mb-2">
-                    Metallic Paint
+                  <div className="text-[10.5px] font-hud uppercase tracking-widest text-slate-400 mb-1.5">
+                    Factory & Custom Respray (16 Finishes)
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     {CAR_PAINTS.map((paint) => (
                       <button
                         key={paint.id}
                         type="button"
                         onClick={() => onUpdateCustomization({ paintId: paint.id })}
                         title={paint.name}
-                        className={`w-8 h-8 rounded-full border-2 cursor-pointer transition-transform ${
+                        className={`w-6 h-6 rounded-full border-2 cursor-pointer transition-transform ${
                           customization.paintId === paint.id
-                            ? 'border-white scale-110'
+                            ? 'border-white scale-115'
                             : 'border-white/20 hover:scale-105'
                         }`}
                         style={{ backgroundColor: paint.css }}
@@ -318,7 +434,7 @@ export function PauseMenuModal({
                 {/* Rim & Underglow */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <div className="text-[11px] font-hud uppercase tracking-widest text-slate-400 mb-1.5">
+                    <div className="text-[10.5px] font-hud uppercase tracking-widest text-slate-400 mb-1.5">
                       Alloy Rims
                     </div>
                     <div className="flex gap-1.5">
@@ -328,7 +444,7 @@ export function PauseMenuModal({
                           type="button"
                           onClick={() => onUpdateCustomization({ rimId: rim.id })}
                           title={rim.name}
-                          className={`w-7 h-7 rounded-md border cursor-pointer ${
+                          className={`w-6 h-6 rounded-md border cursor-pointer ${
                             customization.rimId === rim.id
                               ? 'border-sky-400 ring-1 ring-sky-400'
                               : 'border-white/20'
@@ -340,7 +456,7 @@ export function PauseMenuModal({
                   </div>
 
                   <div>
-                    <div className="text-[11px] font-hud uppercase tracking-widest text-slate-400 mb-1.5">
+                    <div className="text-[10.5px] font-hud uppercase tracking-widest text-slate-400 mb-1.5">
                       Underglow
                     </div>
                     <div className="flex gap-1.5">
@@ -350,7 +466,7 @@ export function PauseMenuModal({
                           type="button"
                           onClick={() => onUpdateCustomization({ underglowId: ug.id })}
                           title={ug.name}
-                          className={`w-7 h-7 rounded-md border cursor-pointer ${
+                          className={`w-6 h-6 rounded-md border cursor-pointer ${
                             customization.underglowId === ug.id
                               ? 'border-sky-400 ring-1 ring-sky-400'
                               : 'border-white/20'
@@ -363,9 +479,9 @@ export function PauseMenuModal({
                 </div>
 
                 {/* Engine & Grip Tuning */}
-                <div className="grid grid-cols-2 gap-3 pt-1">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <div className="text-[11px] font-hud uppercase tracking-widest text-slate-400 mb-1.5">
+                    <div className="text-[10.5px] font-hud uppercase tracking-widest text-slate-400 mb-1">
                       ECU Tune
                     </div>
                     <div className="grid grid-cols-3 gap-1">
@@ -374,7 +490,7 @@ export function PauseMenuModal({
                           key={lvl}
                           type="button"
                           onClick={() => onUpdateCustomization({ engineLevel: lvl })}
-                          className={`py-1.5 rounded text-xs font-hud font-semibold border cursor-pointer ${
+                          className={`py-1 rounded text-xs font-hud font-semibold border cursor-pointer ${
                             customization.engineLevel === lvl
                               ? 'bg-sky-500/20 border-sky-400 text-white'
                               : 'bg-white/[0.03] border-white/10 text-slate-400'
@@ -387,7 +503,7 @@ export function PauseMenuModal({
                   </div>
 
                   <div>
-                    <div className="text-[11px] font-hud uppercase tracking-widest text-slate-400 mb-1.5">
+                    <div className="text-[10.5px] font-hud uppercase tracking-widest text-slate-400 mb-1">
                       Tire Compound
                     </div>
                     <div className="grid grid-cols-3 gap-1">
@@ -396,7 +512,7 @@ export function PauseMenuModal({
                           key={lvl}
                           type="button"
                           onClick={() => onUpdateCustomization({ gripLevel: lvl })}
-                          className={`py-1.5 rounded text-xs font-hud font-semibold border cursor-pointer ${
+                          className={`py-1 rounded text-xs font-hud font-semibold border cursor-pointer ${
                             customization.gripLevel === lvl
                               ? 'bg-sky-500/20 border-sky-400 text-white'
                               : 'bg-white/[0.03] border-white/10 text-slate-400'
@@ -575,11 +691,11 @@ export function PauseMenuModal({
               <div className="p-4 rounded-xl bg-sky-500/10 border border-sky-400/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="font-display text-base font-semibold text-white">
-                    Unity 6 URP Android Source Pack (C#)
+                    Unity 6 URP Android Source Pack (38 Cars + Solara State World Manifest)
                   </h3>
                   <p className="mt-1 text-xs text-slate-300 leading-relaxed">
-                    Includes all C# scripts for Vehicle Physics, All 10 Cars Pack Generator, Traffic & Police AI,
-                    all 8 Weather & 24h Lighting controllers, Mobile Touch UI, SaveSystem, and 1-click Editor Auto-Setup.
+                    Includes all C# scripts for Vehicle Physics, 38-Vehicle Pack Generator, Solara State & Redrock County
+                    JSON World Manifest, Traffic & Police AI, all 8 Weather & 24h Lighting controllers, and Mobile UI.
                   </p>
                 </div>
                 <a
@@ -595,13 +711,13 @@ export function PauseMenuModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                 <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5 font-mono-num text-slate-300">
                   <div className="font-hud uppercase tracking-wider text-slate-400 text-[11px] mb-2">
-                    Included C# Architecture
+                    Included C# & World Manifest Files
                   </div>
-                  <div>OpenWorldCarChase/Assets/Scripts/Vehicle/ (CarController, CarPhysics, CarCamera + All 10 Cars Pack)</div>
-                  <div>OpenWorldCarChase/Assets/Scripts/AI/ (TrafficAI, PoliceAI)</div>
-                  <div>OpenWorldCarChase/Assets/Scripts/World/ (WeatherManager, DayNightManager, RainController, FogController, LightningController, StreetLightController, VehicleWeatherEffects)</div>
-                  <div>OpenWorldCarChase/Assets/Scripts/UI/ (MobileControls, MiniMap, GameManager, WeatherSettingsUI)</div>
-                  <div>OpenWorldCarChase/Assets/Editor/ (ProjectVelocityAutoSetup, VehiclePackGenerator)</div>
+                  <div>Assets/Resources/SolaraStateWorldManifest.json (8192×8192 10-Region Atlas + Spawns)</div>
+                  <div>Assets/Editor/VehiclePackGenerator.cs (Generates all 38 Vehicle Profiles & Prefabs)</div>
+                  <div>Assets/Scripts/Vehicle/ (CarController, CarPhysics, CarCamera, VehicleStatsApplier)</div>
+                  <div>Assets/Scripts/World/ (WeatherManager, DayNightManager, Rain/Fog/Lightning/StreetLights)</div>
+                  <div>Assets/Scripts/AI/ (TrafficAI, PoliceAI) & Assets/Scripts/UI/ (MobileControls, MiniMap)</div>
                 </div>
 
                 <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-400/25 space-y-2 text-slate-200">
@@ -614,8 +730,8 @@ export function PauseMenuModal({
                   </p>
                   <p className="leading-relaxed text-slate-400">
                     Extract the ZIP on PC/Mac, open <code className="text-slate-200">OpenWorldCarChase</code> in Unity 6 URP,
-                    run <code className="text-slate-200">Project Velocity → Auto-Build All Scenes & Weather</code>, and build
-                    for ARM64 IL2CPP to profile on your vivo T3x.
+                    run <code className="text-slate-200">Project Velocity → Generate All Cars Pack</code> and{' '}
+                    <code className="text-slate-200">Auto-Build All Scenes & Weather</code>, then build ARM64 IL2CPP for your vivo T3x.
                   </p>
                 </div>
               </div>

@@ -148,13 +148,13 @@ export function GameHUD({
         <div className="pointer-events-auto flex flex-col sm:flex-row sm:items-end justify-between gap-5">
           <div className="max-w-lg">
             <div className="text-[11px] font-hud uppercase tracking-[0.26em] text-sky-400 mb-1.5 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
-              Open-World Coastal Pursuit · {hud.vehicleName}
+              Solara State & Redrock County · {hud.vehicleName}
             </div>
             <h1 className="font-display text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[0.95] drop-shadow-[0_4px_20px_rgba(0,0,0,0.85)]">
               PROJECT VELOCITY
             </h1>
             <p className="mt-2.5 text-xs sm:text-sm text-slate-200/90 max-w-md drop-shadow-[0_1px_4px_rgba(0,0,0,0.95)]">
-              10 coastal districts, dynamic 24-hour weather, all 10 vehicle classes, holographic GPS routing, and VCPD pursuit AI.
+              38 dealership & fleet vehicles, 10 Solara State regions with restricted zones, dynamic 24-hour weather, and VCPD pursuit AI.
             </p>
 
             <div className="mt-5 flex flex-wrap items-center gap-3">

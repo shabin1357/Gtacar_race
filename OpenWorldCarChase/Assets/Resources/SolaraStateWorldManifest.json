@@ -1,0 +1,105 @@
+{
+  "map_id": "solara_state_redrock_v1",
+  "world_name": "Solara State & Redrock County",
+  "tile_resolution": [8192, 8192],
+  "world_bounds": {
+    "min_x": -4096.0,
+    "max_x": 4096.0,
+    "min_y": -4096.0,
+    "max_y": 4096.0,
+    "water_z": 0.0,
+    "max_elevation_z": 820.0
+  },
+  "districts": [
+    {
+      "id": "redrock_badlands",
+      "name": "Redrock Badlands & Mirage Sea",
+      "grid_sector": "D1-F3",
+      "biome": "Arid Desert & Saltwater Lake",
+      "center": [240, 2100],
+      "wanted_multiplier": 0.8
+    },
+    {
+      "id": "fort_vespera",
+      "name": "Fort Vespera Airbase",
+      "grid_sector": "B3-C3",
+      "biome": "Restricted Military Base",
+      "center": [-2180, 1040],
+      "restricted": true,
+      "base_wanted": 4,
+      "wanted_multiplier": 1.6
+    },
+    {
+      "id": "verona_hills",
+      "name": "Verona Hills & Estates",
+      "grid_sector": "B4-C5",
+      "biome": "Luxury Hillside Canyon",
+      "center": [-1840, 380],
+      "wanted_multiplier": 1.2
+    },
+    {
+      "id": "coral_cove",
+      "name": "Coral Cove Boardwalk",
+      "grid_sector": "B6-C7",
+      "biome": "Coastal Canals & Pier",
+      "center": [-1640, -1420],
+      "wanted_multiplier": 1.0
+    },
+    {
+      "id": "solara_metro",
+      "name": "Solara Metropolis Core",
+      "grid_sector": "D5-E7",
+      "biome": "High-Density Financial Core",
+      "center": [-210, -1620],
+      "wanted_multiplier": 1.5
+    },
+    {
+      "id": "port_meridian",
+      "name": "Port Meridian Docks",
+      "grid_sector": "D8-E8",
+      "biome": "Heavy Industrial Harbor",
+      "center": [-510, -3100],
+      "wanted_multiplier": 1.1
+    },
+    {
+      "id": "solara_airport",
+      "name": "Solara International Airport",
+      "grid_sector": "E8-F8",
+      "biome": "Restricted Aviation Hub",
+      "center": [380, -3420],
+      "restricted": true,
+      "base_wanted": 3,
+      "wanted_multiplier": 1.4
+    },
+    {
+      "id": "neon_cay",
+      "name": "Neon Cay & Lighthouse Point",
+      "grid_sector": "G6-G7",
+      "biome": "Tropical Barrier Resort",
+      "center": [2640, -1880],
+      "wanted_multiplier": 1.2
+    },
+    {
+      "id": "bay_causeway",
+      "name": "Emerald Bay Causeway",
+      "grid_sector": "G5-H5",
+      "biome": "Over-Water Suspension Bridge",
+      "center": [3150, -420],
+      "wanted_multiplier": 1.3
+    },
+    {
+      "id": "solar_ridge",
+      "name": "Mt. Calavera Ridge",
+      "grid_sector": "C1-E1",
+      "biome": "Northern Alpine Peaks",
+      "center": [-960, 2980],
+      "wanted_multiplier": 0.9
+    }
+  ],
+  "player_spawns": [
+    { "name": "Neon Cay Boulevard", "coords": [2480.0, -1420.0, 8.5], "heading": 180.0 },
+    { "name": "Coral Cove Safehouse", "coords": [-1520.0, -1310.0, 12.4], "heading": 90.0 },
+    { "name": "Redrock Desert Airstrip", "coords": [1140.0, 1680.0, 42.1], "heading": 270.0 },
+    { "name": "Solara Metropolis Plaza", "coords": [-180.0, -1580.0, 16.0], "heading": 0.0 }
+  ]
+}

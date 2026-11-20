@@ -17,7 +17,7 @@ import {
 
 const INITIAL_HUD: HudSnapshot = {
   phase: 'title',
-  vehicleName: 'Supercar',
+  vehicleName: 'Pegassi Ignus',
   speedMph: 0,
   speedKph: 0,
   rpmRatio: 0.14,
@@ -272,6 +272,11 @@ export default function App() {
     engineRef.current?.clearGpsWaypoint();
   }, []);
 
+  const handleFastTravel = useCallback((x: number, z: number, label: string, rotY?: number) => {
+    engineRef.current?.teleportToLocation(x, z, label, rotY);
+    setMapOpen(false);
+  }, []);
+
   return (
     <div className="relative w-full h-full overflow-hidden bg-[#090b10]">
       {/* Fullscreen WebGL 3D World Canvas */}
@@ -296,13 +301,14 @@ export default function App() {
         onApplyShowcase={handleApplyShowcase}
       />
 
-      {/* Fullscreen Interactive 10-District GPS Map Modal */}
+      {/* Fullscreen Topographical Solara State Atlas Map Modal */}
       {mapOpen && (
         <InteractiveMapModal
           hud={hud}
           onClose={() => setMapOpen(false)}
           onSetGps={handleSetGps}
           onClearGps={handleClearGps}
+          onFastTravel={handleFastTravel}
         />
       )}
 

@@ -440,7 +440,7 @@ export function createPlayerSupercar(
   policeKit.visible = false;
   bodyGroup.add(policeKit);
 
-  // F. RaceCar / Hypercar Shark Fin + Wide Swan-Neck GT3 Wing
+  // F. RaceCar / Le Mans / Hypercar Shark Fin + Wide Swan-Neck GT3 Wing
   const raceKit = new THREE.Group();
   const sharkFin = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.36, 1.25), accentMaterial);
   sharkFin.position.set(0, 1.32, -1.25);
@@ -450,6 +450,202 @@ export function createPlayerSupercar(
   raceKit.add(sharkFin, bigWing);
   raceKit.visible = false;
   bodyGroup.add(raceKit);
+
+  // G. Open-Top Cabrio / Roadster / Speedster Interior (Seats + Roll Hoops + Low Windshield)
+  const openTopKit = new THREE.Group();
+  const seatMat = new THREE.MeshStandardMaterial({ color: 0x1a1e28, roughness: 0.78, metalness: 0.12 });
+  for (const sx of [-0.42, 0.42]) {
+    const seatBack = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.52, 0.16), seatMat);
+    seatBack.position.set(sx, 1.02, -0.44);
+    seatBack.rotation.x = -0.18;
+    openTopKit.add(seatBack);
+
+    const rollHoop = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.032, 8, 16, Math.PI), chromeMat);
+    rollHoop.position.set(sx, 1.22, -0.58);
+    openTopKit.add(rollHoop);
+  }
+  const openWindshieldFrame = new THREE.Mesh(new THREE.BoxGeometry(1.56, 0.06, 0.08), carbonMat);
+  openWindshieldFrame.position.set(0, 1.18, 0.52);
+  openTopKit.add(openWindshieldFrame);
+  openTopKit.visible = false;
+  bodyGroup.add(openTopKit);
+
+  // H. Benefactor SM722 Twin-Hump Speedster Fairing
+  const speedsterKit = new THREE.Group();
+  for (const sx of [-0.44, 0.44]) {
+    const hump = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.28, 1.18), paintMaterial);
+    hump.position.set(sx, 1.08, -1.16);
+    speedsterKit.add(hump);
+  }
+  speedsterKit.visible = false;
+  bodyGroup.add(speedsterKit);
+
+  // I. Widebody Flared Fender Arches (Feltzer GT / Ubermacht Cypher)
+  const widebodyKit = new THREE.Group();
+  for (const sx of [-1.14, 1.14]) {
+    const archF = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.46, 1.24), paintMaterial);
+    archF.position.set(sx, 0.54, 1.42);
+    const archR = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.52, 1.38), paintMaterial);
+    archR.position.set(sx, 0.58, -1.36);
+    widebodyKit.add(archF, archR);
+  }
+  widebodyKit.visible = false;
+  bodyGroup.add(widebodyKit);
+
+  // J. Wedge Supercar Louver Deck (Torero XO / Bullet GT)
+  const wedgeKit = new THREE.Group();
+  for (let i = 0; i < 4; i++) {
+    const louver = new THREE.Mesh(new THREE.BoxGeometry(1.48, 0.05, 0.22), carbonMat);
+    louver.position.set(0, 0.98 - i * 0.04, -0.95 - i * 0.34);
+    louver.rotation.x = 0.14;
+    wedgeKit.add(louver);
+  }
+  wedgeKit.visible = false;
+  bodyGroup.add(wedgeKit);
+
+  // K. Vintage Art-Deco & 1940s Cruiser Kit (Z-Type 1938 / Classique Broadway)
+  const vintageKit = new THREE.Group();
+  const uprightGrille = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.72, 0.22), chromeMat);
+  uprightGrille.position.set(0, 0.68, 2.38);
+  const frontBumper = new THREE.Mesh(new THREE.BoxGeometry(2.06, 0.14, 0.22), chromeMat);
+  frontBumper.position.set(0, 0.34, 2.48);
+  const rearBumper = new THREE.Mesh(new THREE.BoxGeometry(2.02, 0.14, 0.22), chromeMat);
+  rearBumper.position.set(0, 0.34, -2.44);
+  const vintageFenderMat = new THREE.MeshPhysicalMaterial({
+    color: 0x881337,
+    metalness: 0.72,
+    roughness: 0.18,
+    clearcoat: 1.0,
+  });
+  const teardropFenders: THREE.Mesh[] = [];
+  for (const sx of [-1.06, 1.06]) {
+    const fFender = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.44, 1.92), vintageFenderMat);
+    fFender.position.set(sx, 0.56, 1.25);
+    const rFender = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.46, 1.72), vintageFenderMat);
+    rFender.position.set(sx, 0.58, -1.25);
+    teardropFenders.push(fFender, rFender);
+    vintageKit.add(fFender, rFender);
+  }
+  vintageKit.add(uprightGrille, frontBumper, rearBumper);
+  vintageKit.visible = false;
+  bodyGroup.add(vintageKit);
+
+  // L. Classic Woodgrain Station Wagon Kit (Regina Estate)
+  const wagonKit = new THREE.Group();
+  const wagonRoof = new THREE.Mesh(new THREE.BoxGeometry(1.86, 0.44, 2.86), paintMaterial);
+  wagonRoof.position.set(0, 1.18, -0.78);
+  const woodMat = new THREE.MeshStandardMaterial({ color: 0x7c3f16, roughness: 0.56, metalness: 0.12 });
+  for (const sx of [-1.04, 1.04]) {
+    const woodPanel = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.36, 4.1), woodMat);
+    woodPanel.position.set(sx, 0.56, -0.05);
+    wagonKit.add(woodPanel);
+  }
+  wagonKit.add(wagonRoof);
+  wagonKit.visible = false;
+  bodyGroup.add(wagonKit);
+
+  // M. Minivan MPV Kit
+  const minivanKit = new THREE.Group();
+  const vanRoof = new THREE.Mesh(new THREE.BoxGeometry(1.84, 0.56, 2.75), paintMaterial);
+  vanRoof.position.set(0, 1.28, -0.52);
+  const vanRailL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 2.1), carbonMat);
+  vanRailL.position.set(-0.72, 1.58, -0.5);
+  const vanRailR = vanRailL.clone();
+  vanRailR.position.x = 0.72;
+  minivanKit.add(vanRoof, vanRailL, vanRailR);
+  minivanKit.visible = false;
+  bodyGroup.add(minivanKit);
+
+  // N. Boxy Tactical Hummer H2 Kit (Patriot H2)
+  const hummerKit = new THREE.Group();
+  const hummerBox = new THREE.Mesh(new THREE.BoxGeometry(2.06, 0.62, 2.95), paintMaterial);
+  hummerBox.position.set(0, 1.24, -0.55);
+  const hummerGrille = new THREE.Mesh(new THREE.BoxGeometry(1.76, 0.48, 0.24), carbonMat);
+  hummerGrille.position.set(0, 0.64, 2.44);
+  hummerKit.add(hummerBox, hummerGrille);
+  hummerKit.visible = false;
+  bodyGroup.add(hummerKit);
+
+  // O. Downtown Taxi Kit (Glowing Yellow Roof TAXI Sign + Blue Lower Livery)
+  const taxiKit = new THREE.Group();
+  const taxiSignMat = new THREE.MeshStandardMaterial({
+    color: 0xfef08a,
+    emissive: 0xfacc15,
+    emissiveIntensity: 3.4,
+    roughness: 0.2,
+  });
+  const taxiSign = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.19, 0.26), taxiSignMat);
+  taxiSign.position.set(0, 1.38, -0.18);
+  const taxiBlueMat = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.28, metalness: 0.45 });
+  for (const sx of [-1.05, 1.05]) {
+    const blueSide = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 3.65), taxiBlueMat);
+    blueSide.position.set(sx, 0.56, -0.05);
+    taxiKit.add(blueSide);
+  }
+  taxiKit.add(taxiSign);
+  taxiKit.visible = false;
+  bodyGroup.add(taxiKit);
+
+  // P. Park Ranger Patrol SUV Stripe Kit
+  const rangerKit = new THREE.Group();
+  const rangerGreenMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.34, metalness: 0.25 });
+  for (const sx of [-1.05, 1.05]) {
+    const greenStripe = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.22, 4.1), rangerGreenMat);
+    greenStripe.position.set(sx, 0.72, -0.05);
+    rangerKit.add(greenStripe);
+  }
+  rangerKit.visible = false;
+  bodyGroup.add(rangerKit);
+
+  // Q. Police Black & White Patrol Doors Overlay
+  const policeDoorKit = new THREE.Group();
+  const whiteDoorMat = new THREE.MeshPhysicalMaterial({ color: 0xf8fafc, roughness: 0.18, metalness: 0.2, clearcoat: 0.9 });
+  for (const sx of [-1.04, 1.04]) {
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.56, 1.95), whiteDoorMat);
+    door.position.set(sx, 0.62, -0.05);
+    policeDoorKit.add(door);
+  }
+  const whiteRoof = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.06, 1.35), whiteDoorMat);
+  whiteRoof.position.set(0, 1.29, -0.4);
+  policeDoorKit.add(whiteRoof);
+  policeDoorKit.visible = false;
+  bodyGroup.add(policeDoorKit);
+
+  // R. Racing Livery Overlays (Twin Stripes, Center Hood Wedge, Sideblades)
+  const liveryMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.35, metalness: 0.4 });
+
+  const twinStripeKit = new THREE.Group();
+  for (const sx of [-0.26, 0.26]) {
+    const hoodStripe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.03, 1.55), liveryMat);
+    hoodStripe.position.set(sx, 0.81, 1.48);
+    hoodStripe.rotation.x = 0.16;
+    const roofStripe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.03, 1.4), liveryMat);
+    roofStripe.position.set(sx, 1.28, -0.42);
+    const rearStripe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.03, 1.15), liveryMat);
+    rearStripe.position.set(sx, 0.92, -1.72);
+    twinStripeKit.add(hoodStripe, roofStripe, rearStripe);
+  }
+  twinStripeKit.visible = false;
+  bodyGroup.add(twinStripeKit);
+
+  const centerWedgeKit = new THREE.Group();
+  const wedgeHood = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.04, 1.62), liveryMat);
+  wedgeHood.position.set(0, 0.81, 1.48);
+  wedgeHood.rotation.x = 0.16;
+  const wedgeRoof = new THREE.Mesh(new THREE.BoxGeometry(1.18, 0.04, 1.28), liveryMat);
+  wedgeRoof.position.set(0, 1.28, -0.42);
+  centerWedgeKit.add(wedgeHood, wedgeRoof);
+  centerWedgeKit.visible = false;
+  bodyGroup.add(centerWedgeKit);
+
+  const sideAccentKit = new THREE.Group();
+  for (const sx of [-1.06, 1.06]) {
+    const blade = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 1.55), liveryMat);
+    blade.position.set(sx, 0.62, -0.58);
+    sideAccentKit.add(blade);
+  }
+  sideAccentKit.visible = false;
+  bodyGroup.add(sideAccentKit);
 
   // 7. Side Mirrors & Illuminated License Plate (ZV766 — Screenshot #1!)
   const mirrorGeo = new THREE.BoxGeometry(0.28, 0.11, 0.18);
@@ -577,7 +773,10 @@ export function createPlayerSupercar(
     if (isFront) frontWheelPivots.push(pivot);
   }
 
-  let currentClassId: VehicleClassId = 'Supercar';
+  let currentClassId: VehicleClassId = 'PegassiIgnus';
+  let currentHasPoliceLightbar = false;
+  let currentIsOpenTop = false;
+  let isCockpitActive = false;
   let wiperPhase = 0;
 
   return {
@@ -614,34 +813,85 @@ export function createPlayerSupercar(
     },
     applyVehicleSpec: (spec: VehicleSpec) => {
       currentClassId = spec.id;
+      const style = spec.bodyStyle;
       const sx = spec.width / 2.0;
       const sy = spec.height / 1.15;
       const sz = spec.length / 4.6;
       bodyGroup.scale.set(sx, sy, sz);
 
-      // Lifted suspension clearance for OffRoad4x4, SUV, PickupTruck
+      // Lifted suspension clearance for Off-Road 4x4, Hummer, SUV, Pickup
       const liftY =
-        spec.id === 'OffRoad4x4' ? 0.22 : spec.id === 'PickupTruck' || spec.id === 'SUV' ? 0.14 : 0;
+        style === 'trail_4x4' || style === 'hummer_4x4'
+          ? 0.24
+          : style === 'open_pickup' || style === 'suv' || style === 'ranger_suv'
+            ? 0.15
+            : 0;
       bodyGroup.position.y = liftY;
 
-      gtWingGroup.visible =
-        spec.id === 'SportsCar' || spec.id === 'Supercar' || spec.id === 'Hypercar';
-      muscleKit.visible = spec.id === 'MuscleCar';
-      suvKit.visible = spec.id === 'SUV' || spec.id === 'OffRoad4x4';
-      offRoadKit.visible = spec.id === 'OffRoad4x4';
-      pickupKit.visible = spec.id === 'PickupTruck';
-      policeKit.visible = spec.id === 'PoliceCar';
-      raceKit.visible = spec.id === 'RaceCar' || spec.id === 'Hypercar';
+      currentIsOpenTop =
+        style === 'cabrio' || style === 'roadster' || style === 'speedster' || style === 'open_pickup';
+      canopy.visible = !isCockpitActive && !currentIsOpenTop;
 
-      // Larger off-road tires for 4x4 / SUV / Pickup
+      // Toggle body style kits
+      gtWingGroup.visible =
+        style === 'supercar' ||
+        style === 'hypercar' ||
+        style === 'widebody' ||
+        spec.id === 'CometTurbo' ||
+        spec.id === 'BansheeV10';
+      muscleKit.visible = style === 'muscle' && spec.id !== 'BuffaloEVX';
+      suvKit.visible = style === 'suv' || style === 'trail_4x4' || style === 'ranger_suv';
+      offRoadKit.visible = style === 'trail_4x4';
+      pickupKit.visible = style === 'open_pickup';
+      policeKit.visible = style === 'police' || style === 'ranger_suv';
+      currentHasPoliceLightbar = style === 'police' || style === 'ranger_suv';
+      raceKit.visible =
+        style === 'lemans' ||
+        spec.id === 'OverflodEntityMT' ||
+        spec.id === 'OverflodZeno' ||
+        spec.id === 'OsirisCarbon';
+      openTopKit.visible = style === 'cabrio' || style === 'roadster' || style === 'speedster';
+      speedsterKit.visible = style === 'speedster';
+      widebodyKit.visible = style === 'widebody';
+      wedgeKit.visible = style === 'wedge';
+      vintageKit.visible = style === 'vintage_artdeco' || style === 'vintage_cruiser';
+      wagonKit.visible = style === 'wagon';
+      minivanKit.visible = style === 'minivan';
+      hummerKit.visible = style === 'hummer_4x4';
+      taxiKit.visible = style === 'taxi';
+      rangerKit.visible = style === 'ranger_suv';
+      policeDoorKit.visible = spec.livery === 'police_bw';
+
+      // Vintage fenders match accent color (e.g. Crimson on Z-Type 1938) or body color (Broadway)
+      if (spec.livery === 'two_tone_fenders') {
+        vintageFenderMat.color.setHex(spec.defaultAccentHex);
+      } else {
+        vintageFenderMat.color.copy(paintMaterial.color);
+      }
+      for (const f of teardropFenders) {
+        f.visible = style === 'vintage_artdeco' || style === 'vintage_cruiser';
+      }
+
+      // Livery overlays
+      liveryMat.color.setHex(spec.defaultAccentHex);
+      twinStripeKit.visible = spec.livery === 'twin_stripes';
+      centerWedgeKit.visible = spec.livery === 'center_wedge';
+      sideAccentKit.visible = spec.livery === 'side_accent';
+
+      // Larger off-road tires for 4x4 / Hummer / Ranger / Pickup
       const wheelScale =
-        spec.id === 'OffRoad4x4' ? 1.24 : spec.id === 'SUV' || spec.id === 'PickupTruck' ? 1.14 : 1.0;
+        style === 'trail_4x4' || style === 'hummer_4x4'
+          ? 1.26
+          : style === 'suv' || style === 'ranger_suv' || style === 'open_pickup'
+            ? 1.15
+            : 1.0;
       for (const w of wheelMeshes) {
         w.scale.set(wheelScale, wheelScale, wheelScale);
       }
     },
     setCockpitViewActive: (active: boolean) => {
-      canopy.visible = !active;
+      isCockpitActive = active;
+      canopy.visible = !active && !currentIsOpenTop;
       cockpitGroup.visible = active;
     },
     setBraking: (braking: boolean) => {
@@ -696,8 +946,8 @@ export function createPlayerSupercar(
         raindropGlassMat.opacity = THREE.MathUtils.damp(raindropGlassMat.opacity, 0, 4, dt);
       }
 
-      // Active PoliceCar player strobe when driving PoliceCar class
-      if (currentClassId === 'PoliceCar') {
+      // Active Police / Park Ranger strobe when driving patrol vehicles
+      if (currentHasPoliceLightbar || currentClassId === 'PoliceCruiser') {
         const phase = Math.floor(time * 9.5) % 4;
         const isRed = phase < 2;
         const pulse = phase % 2 === 0 ? 1.0 : 0.35;
