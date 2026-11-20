@@ -1,0 +1,6 @@
+{
+  "name": "Vice Run",
+  "description": "An open-world coastal car chase game with high-fidelity 3D graphics, dynamic sunset-to-midnight lighting, realistic supercar physics, and escalating police pursuits.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
